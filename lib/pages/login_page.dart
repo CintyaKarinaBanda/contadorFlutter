@@ -181,9 +181,10 @@ class _RememberState extends State<Remember> {
       children: [
         Checkbox(
           value: checked,
-          onChanged: (checked) => {
-            setState(()=>checked == false ? checked = true : checked = false
-            )
+          onChanged: (isChecked) {
+            setState(() {
+              checked = isChecked ?? false;
+            });
           },
         ),
         const Text(
