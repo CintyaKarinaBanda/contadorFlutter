@@ -1,5 +1,5 @@
 // ignore_for_file: unnecessary_set_literal
-
+import "package:counter/pages/olvideMiContase%C3%B1a.dart";
 import "package:flutter/material.dart";
 
 class LoginPage extends StatefulWidget {
@@ -193,9 +193,17 @@ class _RememberState extends State<Remember> {
         ),
         const Spacer(),
         TextButton(
-          onPressed: ()=>{},
+          onPressed: () {
+            // Navegar a otra interfaz aquí
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const OlvideMiContrasena(),
+              ),
+            );
+          },
           child: const Text(
-            "¿Olvido su contraseña?",
+            "¿Olvidó su contraseña?",
             style: TextStyle(fontSize: 12,),
           ),
         ),
