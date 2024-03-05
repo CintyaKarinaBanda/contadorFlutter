@@ -1,8 +1,20 @@
 //import 'package:counter/pages/home_page.dart';
 import 'package:counter/pages/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: "AIzaSyCtspMJkuzUaeVIVB7oCdOweopFXkFNkiI",
+      authDomain: "flutterprueba-4845f.firebaseapp.com",
+      projectId: "flutterprueba-4845f",
+      storageBucket: "flutterprueba-4845f.appspot.com",
+      messagingSenderId: "663278888782",
+      appId: "1:663278888782:web:b0e01c19458f23f3e0e01f",
+    ),
+  );
   runApp(const MyApp());
 }
 

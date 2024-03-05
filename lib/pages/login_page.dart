@@ -1,22 +1,73 @@
-// ignore_for_file: unnecessary_set_literal
-import "package:counter/pages/olvideMiContase%C3%B1a.dart";
-import "package:flutter/material.dart";
+// ignore_for_file: avoid_print
+
+import 'package:counter/pages/olvideMiContase%C3%B1a.dart';
+import 'package:counter/pages/principal_page.dart';
+import 'package:counter/pages/registro_page.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+class AuthController {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<void> signInWithEmailAndPassword(String email, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      print("Usuario Autenticado");
+    } catch (e) {
+      print("Error al iniciar sesión: $e");
+    }
+  }
+}
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  // ignore: library_private_types_in_public_api
+  _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  // ignore: unused_element
+  Future<void> _signIn() async {
+  try {
+    await _auth.signInWithEmailAndPassword(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+    print("Usuario Autenticado");
+    // ignore: use_build_context_synchronously
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const Principal(),
+      ),
+    );
+
+  } catch (e) {
+    // Manejo de errores
+    print("Error al iniciar sesión: $e");
+  }
+}
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Stack(
         children: [
-          Fondo(),
-          Contenido(),
+          const Fondo(),
+          Contenido(
+            auth: _auth,
+            emailController: _emailController,
+            passwordController: _passwordController,
+          ),
         ],
       ),
     );
@@ -24,29 +75,37 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 class Fondo extends StatelessWidget {
-  const Fondo({super.key});
+  const Fondo({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Colors.blue.shade300,
-            Colors.blue
-            ],
-            begin: Alignment.centerRight,
-            end: Alignment.centerLeft
-          )
+          colors: [Colors.blue.shade300, Colors.blue],
+          begin: Alignment.centerRight,
+          end: Alignment.centerLeft,
+        ),
       ),
     );
   }
 }
 
 class Contenido extends StatefulWidget {
-  const Contenido({super.key});
+  final FirebaseAuth auth;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+
+  const Contenido({
+    required this.auth,
+    required this.emailController,
+    required this.passwordController,
+    Key? key,
+  }) : super(key: key);
+
   @override
-  State<Contenido> createState() => _ContenidoState();
+  // ignore: library_private_types_in_public_api
+  _ContenidoState createState() => _ContenidoState();
 }
 
 class _ContenidoState extends State<Contenido> {
@@ -76,14 +135,25 @@ class _ContenidoState extends State<Contenido> {
             ),
           ),
           const SizedBox(height: 10),
-          const Datos(),
+          Datos(
+            emailController: widget.emailController,
+            passwordController: widget.passwordController,
+            auth: widget.auth,
+          ),
           const SizedBox(height: 30),
           Container(
             alignment: Alignment.center,
             child: TextButton(
-              onPressed: () => {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RegistroPage(),
+                  ),
+                );
+              },
               child: const Text(
-                "Aviso de Privacidad",
+                "Registrarse",
                 style: TextStyle(fontSize: 14),
               ),
             ),
@@ -94,9 +164,17 @@ class _ContenidoState extends State<Contenido> {
   }
 }
 
-
 class Datos extends StatefulWidget {
-  const Datos({super.key});
+  final FirebaseAuth auth;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+
+  const Datos({
+    required this.auth,
+    required this.emailController,
+    required this.passwordController,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<Datos> createState() => _DatosState();
@@ -104,6 +182,7 @@ class Datos extends StatefulWidget {
 
 class _DatosState extends State<Datos> {
   bool showPassword = true;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -125,6 +204,7 @@ class _DatosState extends State<Datos> {
           ),
           const SizedBox(height: 5,),
           TextFormField(
+            controller: widget.emailController,
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
@@ -142,6 +222,7 @@ class _DatosState extends State<Datos> {
           ),
           const SizedBox(height: 5,),
           TextFormField(
+            controller: widget.passwordController,
             obscureText: showPassword,
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
@@ -149,9 +230,9 @@ class _DatosState extends State<Datos> {
               suffixIcon: IconButton(
                 icon: const Icon(Icons.remove_red_eye_outlined),
                 onPressed: () => {
-                    setState(() {
-                      showPassword == true ? showPassword = false : showPassword = true;
-                    })                
+                  setState(() {
+                    showPassword == true ? showPassword = false : showPassword = true;
+                  })                
                 },
               )
             ),
@@ -159,7 +240,10 @@ class _DatosState extends State<Datos> {
           const SizedBox(height: 5,),
           const Remember(),
           const SizedBox( height: 5, ),
-          const Botones(),
+          Botones(
+            emailController: widget.emailController,
+            passwordController: widget.passwordController,
+          ),
         ],        
       ),
     );
@@ -167,7 +251,7 @@ class _DatosState extends State<Datos> {
 }
 
 class Remember extends StatefulWidget {
-  const Remember({super.key});
+  const Remember({Key? key}) : super(key: key);
 
   @override
   State<Remember> createState() => _RememberState();
@@ -175,6 +259,7 @@ class Remember extends StatefulWidget {
 
 class _RememberState extends State<Remember> {
   bool checked = false;
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -194,7 +279,6 @@ class _RememberState extends State<Remember> {
         const Spacer(),
         TextButton(
           onPressed: () {
-            // Navegar a otra interfaz aquí
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -213,28 +297,44 @@ class _RememberState extends State<Remember> {
 }
 
 class Botones extends StatelessWidget {
-  const Botones({super.key});
+  final AuthController _authController = AuthController();
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+
+  Botones({
+    Key? key,
+    required this.emailController,
+    required this.passwordController,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return  Column(
       children: [
         SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton(
-            onPressed: ()=>{},
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(const Color(0xff142047))
-            ),
-            child: const Text(
-              "Login",
-              style: TextStyle(
-                color: Colors.white
-              ),
-            ),            
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: () async {
+          print("Antes de la autenticación");
+          await _authController.signInWithEmailAndPassword(
+            emailController.text,
+            passwordController.text,
+          );
+          print("Despues de la autenticación");
+          
+        },
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(const Color(0xff142047)),
+        ),
+        child: const Text(
+          "Login",
+          style: TextStyle(
+            color: Colors.white,
           ),
         ),
+      ),
+    ),
         const SizedBox(
           height: 25,
           width: double.infinity,

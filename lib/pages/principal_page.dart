@@ -1,14 +1,14 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart'; 
 
-class OlvideMiContrasena extends StatefulWidget {
-  const OlvideMiContrasena({Key? key}) : super(key: key);
+class Principal extends StatefulWidget {
+  const Principal({Key? key}) : super(key: key);
 
   @override
-  State<OlvideMiContrasena> createState() => _OlvideMiContrasenaState();
+  State<Principal> createState() => _PrincipalState();
 }
 
-class _OlvideMiContrasenaState extends State<OlvideMiContrasena> {
+class _PrincipalState extends State<Principal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +33,7 @@ class _OlvideMiContrasenaState extends State<OlvideMiContrasena> {
           mainAxisAlignment: MainAxisAlignment.center, // Centrar los elementos verticalmente
           children: [
             Text(
-              "Página para recuperar contraseña",
+              "Página principal",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
